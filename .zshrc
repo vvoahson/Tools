@@ -1,3 +1,36 @@
+function scan_shellcode() {
+  # Ensure these options are turned on inside the function
+  setopt extendedglob
+  setopt NULL_GLOB
+
+  # Gather all matching files in an array
+  local files=(/tmp/[A-Z]##_[A-Z]##)
+
+  # If no matches, let the user know and exit
+  if [[ ${#files[@]} -eq 0 ]]; then
+    echo "No matching uppercase_underscore_uppercase files found in /tmp."
+    return 1
+  fi
+
+  echo "Select a file to process:"
+  # Built-in zsh/bash 'select' prompt to choose a file
+  select f in "${files[@]}"; do
+    # If the user chooses a valid option, process the file
+    if [[ -n "$f" ]]; then
+      cat "$f" | python3 ~/scripts/encoders/build_xor_payload.py
+    else
+      echo "Invalid selection."
+    fi
+    break
+  done
+}
+
+
+
+
+
+
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -94,10 +127,24 @@ alias ls='ls --color'
 alias vim='nvim'
 alias c='clear'
 alias xcopy='xclip -selection clipboard'
-
-#alias py-venv='/home/w0ahs0n/scripts/py-venv.sh'
+alias untar='tar -xf'
+alias py-venv='source /home/w0ahs0n/scripts/py-venv.sh'
+alias hosts='sudo nano /etc/hosts'
+alias untar='tar -xvzf'
+alias new-host='sudo cp /etc/hosts.bak /etc/hosts; sudo nano /etc/hosts'
+alias sliver-server='rlwrap sliver-server'
 
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
+
+# Exports
+export DISPLAY=kali:10.0
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export PATH=$PATH:/usr/local/go/bin:/usr/local/bin:/usr/local:/usr/local/go/bin:/home/w0ahs0n/.local/bin/
+alias  get-logs='sudo less +G /var/log/apache2/access.log'
+export PATH=/tmp/ruby-2.7.3/bin:$PATH
